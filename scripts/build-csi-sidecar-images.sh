@@ -1,12 +1,13 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
     echo "Illegal number of arguments. Registry name and list of repo_branch_tag are required." >/dev/stderr
     exit 1
 fi
 
 registry_name="$1"
 list_of_repo_branch_tag="$2"
+create_tag="$3"
 
 IFS=' ' read -r -a items <<<"$list_of_repo_branch_tag"
 
@@ -32,8 +33,13 @@ for repo_branch_tag in "${items[@]}"; do
     if git rev-parse "$tag" >/dev/null 2>&1; then
         echo "Tag $tag already exists"
     else
-        git tag "$tag"
-        git push origin "$tag"
+        if [ "$create_tag" == "true" ]; then
+            git tag "$tag"
+            git push origin "$tag"
+        else
+            echo "Tag $tag does not exist" >/dev/stderr
+            exit 1
+        fi
     fi
 
     if [ "$repo" == "csi-snapshotter" ]; then
