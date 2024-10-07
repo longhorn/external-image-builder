@@ -1,0 +1,38 @@
+name: Sync CSI Repos with Upstream
+
+on:
+  schedule:
+    # Every day at 3:00
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Setup Git
+      run: |
+        gh auth setup-git
+
+    - run: |
+        git config --global user.email "derek.su@suse.com"
+        git config --global user.name "Derek Su"
+
+    - uses: actions/checkout@v4
+
+    - name: Sync Repos
+      run: bash ./scripts/sync-csi-repos-with-upstream.sh

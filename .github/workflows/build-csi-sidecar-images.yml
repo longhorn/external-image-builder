@@ -1,4 +1,4 @@
-name: Build External Images
+name: Build CSI Sidecar Images
 
 on:
   workflow_dispatch:
