@@ -1,0 +1,50 @@
+name: Build External Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      registry_name:
+        description: "Docker registry name. For example: longhornio"
+        default: "longhornio"
+        required: true
+      list_of_repo_branch_tag:
+        description: "Space separated list of repo:branch:tag. For example:csi-attacher:longhorn-release-4.6.1:v4.6.1-20241007 csi-provisioner:longhorn-release-4.0.1:v4.6.1-20241007"
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_ACTION_TOKEN }}
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - name: Setup Git
+      run: |
+        gh auth setup-git
+
+    - run: |
+        git config --global user.email "derek.su@suse.com"
+        git config --global user.name "Derek Su"
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v4
+
+    - name: Build images
+      run: bash ./scripts/build-csi-sidecar-images.sh "${{ inputs.registry_name }}" "${{ inputs.list_of_repo_branch_tag }}"
