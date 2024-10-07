@@ -36,6 +36,11 @@ for repo_branch_tag in "${items[@]}"; do
         git push origin "$tag"
     fi
 
+    if [ "$repo" == "csi-snapshotter" ]; then
+        # Only build csi-snapshotter
+        sed -i '' 's/CMDS=snapshot-controller csi-snapshotter snapshot-validation-webhook/CMDS=csi-snapshotter/g' Makefile
+    fi
+
     # Run the release build
     export REGISTRY_NAME="$registry_name"
     export PULL_BASE_REF="$tag"
