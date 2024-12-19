@@ -44,7 +44,7 @@ for repo_branch_tag in "${items[@]}"; do
 
     if [ "$repo" == "csi-snapshotter" ]; then
         # Only build csi-snapshotter
-        sed -i '' 's/CMDS=snapshot-controller csi-snapshotter snapshot-validation-webhook/CMDS=csi-snapshotter/g' Makefile
+        sed -i.bkp 's/CMDS=snapshot-controller csi-snapshotter snapshot-validation-webhook/CMDS=csi-snapshotter/g' Makefile
     fi
 
     # Run the release build
