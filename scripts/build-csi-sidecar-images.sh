@@ -51,7 +51,7 @@ for repo_branch_tag in "${items[@]}"; do
     export REGISTRY_NAME="$registry_name"
     export PULL_BASE_REF="$tag"
     export CSI_PROW_WORK="$(pwd)/csi-prow-work"
-    
+
     if ! mkdir -p "${CSI_PROW_WORK}"; then
         echo "Error: Failed to create directory ${CSI_PROW_WORK}" >&2
         exit 1
