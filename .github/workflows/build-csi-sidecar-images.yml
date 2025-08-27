@@ -36,13 +36,16 @@ jobs:
       run: |
         echo "${{ steps.app-token.outputs.token }}" | gh auth login --with-token
 
-    - name: Create and push tags using gh
+    - name: Create and push tags using gh API
       if: ${{ inputs.create_tag == 'true' }}
       run: |
         for entry in ${{ inputs.list_of_repo_branch_tag }}; do
           tag=$(echo "$entry" | cut -d':' -f3)
-          echo "Creating and pushing tag $tag"
-          gh release create "$tag" --title "$tag" --notes "Automated release $tag"
+          sha=$(git rev-parse HEAD)
+          echo "Creating tag $tag at commit $sha"
+          gh api -X POST /repos/${{ github.repository }}/git/refs \
+            -f ref="refs/tags/$tag" \
+            -f sha="$sha"
         done
 
     - name: Log in to Docker Hub
