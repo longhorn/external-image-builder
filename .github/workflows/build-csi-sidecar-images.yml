@@ -14,39 +14,42 @@ on:
         description: "Create tag"
         default: "false"
 
-defaults:
-  run:
-    shell: bash
-
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   release:
     runs-on: ubuntu-latest
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
     permissions:
       contents: write
 
     steps:
-    - name: Setup Git
-      run: |
-        gh auth setup-git
+    - uses: actions/checkout@v4
 
-    - run: |
-        git config --global user.email "derek.su@suse.com"
-        git config --global user.name "Derek Su"
+    - id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ secrets.LONGHORN_GITHUB_BOT_APP_ID }}
+        private-key: ${{ secrets.LONGHORN_GITHUB_BOT_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+        permission-contents: write
+
+    - name: Authenticate gh CLI with App token
+      run: |
+        echo "${{ steps.app-token.outputs.token }}" | gh auth login --with-token
+
+    - name: Create and push tags using gh
+      if: ${{ inputs.create_tag == 'true' }}
+      run: |
+        for entry in ${{ inputs.list_of_repo_branch_tag }}; do
+          tag=$(echo "$entry" | cut -d':' -f3)
+          echo "Creating and pushing tag $tag"
+          gh release create "$tag" --title "$tag" --notes "Automated release $tag"
+        done
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v4
 
     - name: Build Images
       run: bash ./scripts/build-csi-sidecar-images.sh "${{ inputs.registry_name }}" "${{ inputs.list_of_repo_branch_tag }}" "${{ inputs.create_tag }}"

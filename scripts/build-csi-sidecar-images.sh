@@ -34,8 +34,16 @@ for repo_branch_tag in "${items[@]}"; do
         echo "Tag $tag already exists"
     else
         if [ "$create_tag" == "true" ]; then
-            git tag "$tag"
-            git push origin "$tag"
+            echo "Creating tag $tag"
+            git tag "$tag" || {
+                echo "Failed to create tag $tag" >&2
+                exit 1
+            }
+            echo "Pushing tag $tag to origin"
+            git push origin "$tag" || {
+                echo "Failed to push tag $tag to origin" >&2
+                exit 1
+            }
         else
             echo "Tag $tag does not exist" >/dev/stderr
             exit 1
