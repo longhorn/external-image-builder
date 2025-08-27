@@ -40,8 +40,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Images
-      env:
-        GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
         # Authenticate gh CLI with GitHub App Token
         echo "${{ steps.app-token.outputs.token }}" | gh auth login --with-token
