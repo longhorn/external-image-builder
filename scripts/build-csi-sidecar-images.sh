@@ -72,7 +72,7 @@ for repo_branch_tag in "${items[@]}"; do
 
     # Special handling for csi-snapshotter
     if [ "$repo" == "csi-snapshotter" ]; then
-        sed -i.bkp 's/CMDS=snapshot-controller csi-snapshotter/CMDS=csi-snapshotter/g' Makefile
+        sed -i.bkp 's/CMDS=snapshot-controller csi-snapshotter snapshot-conversion-webhook/CMDS=csi-snapshotter/g' Makefile
     fi
 
     # Set environment for build
