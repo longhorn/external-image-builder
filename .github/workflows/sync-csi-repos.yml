@@ -32,7 +32,7 @@ jobs:
         git config --global user.email "derek.su@suse.com"
         git config --global user.name "Derek Su"
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
     - name: Sync Repos
       run: bash ./scripts/sync-csi-repos-with-upstream.sh
